@@ -41,5 +41,9 @@ usuarioSchema.pre('save', async function (next) {
   next();
 });
 
+usuarioSchema.methods.comprobarContraseña = async function (contraseñaFormulario) {
+  return await bcrypt.compare(contraseñaFormulario, this.contraseña);
+};
+
 const Usuario = mongoose.model('Usuario', usuarioSchema);
 export default Usuario;
