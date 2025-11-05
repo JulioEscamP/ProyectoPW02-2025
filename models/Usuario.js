@@ -35,7 +35,7 @@ usuarioSchema.pre('save', async function (next) {
     return next();
   }
   
-  // Salt = NUmero randow unico.
+  // Salt = NUmero random unico.
   const salt = await bcrypt.genSalt(10);
   this.contraseña = await bcrypt.hash(this.contraseña, salt);
   next();
