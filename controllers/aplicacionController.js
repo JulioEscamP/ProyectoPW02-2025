@@ -1,5 +1,6 @@
 import Aplicacion from "../models/Aplicacion.js";
 import Proyecto from "../models/Proyecto.js";
+import graphExcelService from "../services/graphExcel.service.js";
 
 export const createAplicacion = async (req, res) => {
   try {
@@ -29,11 +30,23 @@ export const createAplicacion = async (req, res) => {
 
     await aplicacion.save();
 
+     //TODO integrar ms graph api para registrar en excel
+
+    const aplicacionPopulada = await Aplicacion.findById(aplicacion._id)
+      .populate("estudiante", "nombre correo")
+      .populate("proyecto", "titulo descripcion");
+
+    const excelResult = await graphExcelService.addRowToExcel(aplicacionPopulada);
+    
+    if (!excelResult.success) {
+      console.warn("Advertencia: No se pudo registrar en Excel:", excelResult.message || excelResult.error);
+    }
+
     //TODO integrar ms graph api para registrar en excel
 
     res
       .status(201)
-      .json({ msg: "Aplicación registrada exitosamente.", data: aplicacion });
+      .json({ msg: "Aplicación registrada exitosamente.", data: aplicacion,excelSync: excelResult.success });
   } catch (error) {
     if (error.code === 11000) {
       return res
@@ -88,9 +101,20 @@ export const updateEstadoAplicacion = async (req, res) => {
     aplicacion.estado = estado;
     await aplicacion.save();
 
+    // logica de sincronizacion con el excel 
+
+    const excelResult = await graphExcelService.updateRowInExcel(aplicacion._id, estado);
+    
+    if (!excelResult.success) {
+      console.warn("Advertencia: No se pudo actualizar en Excel:", excelResult.message || excelResult.error);
+    }
+
+
     res
       .status(200)
-      .json({ msg: "Estado de la aplicación actualizado.", data: aplicacion });
+      .json({ msg: "Estado de la aplicación actualizado.", data: aplicacion,
+        excelSync: excelResult.success //linea se añade al estado de sincronización
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Error al actualizar la aplicación." });
