@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "Backend",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seeder": "node seeder/seeder.js",
+    "seeder:d": "node seeder/seeder.js -d"
   },
   "repository": {
     "type": "git",
