@@ -1,5 +1,5 @@
 import express from 'express';
-import { createInstitucion, getInstituciones, updateInstitucion } from '../controllers/institucionController.js';
+import { createInstitucion, getInstituciones, updateInstitucion, deleteInstitucion } from '../controllers/institucionController.js';
 import { checkJwt, isAdmin } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
@@ -15,6 +15,7 @@ router.post('/', createInstitucion);
 // PUT /api/instituciones/:id
 router.put('/:id', updateInstitucion);
 // DELETE /api/instituciones/:id
-//TODO router.delete('/:id', deleteInstitucion);
+
+router.delete('/:id', deleteInstitucion);
 
 export default router;

@@ -1,4 +1,5 @@
 import Institucion from "../models/Institucion.js";
+import Proyecto from '../models/Proyecto.js';
 
 export const createInstitucion = async (req, res) => {
   try {
@@ -69,3 +70,31 @@ export const updateInstitucion = async (req, res) => {
 };
 
 //TODO delete institucion
+export const deleteInstitucion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const proyectosAsociados = await Proyecto.countDocuments({ institucion: id });
+    
+    if (proyectosAsociados > 0) {
+      return res.status(400).json({ 
+        msg: "No se puede eliminar la institución porque tiene proyectos asociados",
+        proyectosAsociados 
+      });
+    }
+    
+    const institucion = await Institucion.findByIdAndDelete(id);
+    
+    if (!institucion) {
+      return res.status(404).json({ msg: "Institución no encontrada" });
+    }
+    
+    res.status(200).json({ 
+      msg: "Institución eliminada exitosamente",
+      data: institucion 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al eliminar la institución" });
+  }
+};
