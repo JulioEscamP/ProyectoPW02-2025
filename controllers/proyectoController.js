@@ -44,6 +44,22 @@ export const getProyectos = async (req, res) => {
     res.status(500).json({ msg: "Error al obtener los proyectos." });
   }
 };
+// gwt para obtener un proyecto por ID 
+export const getProyectoById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const proyecto = await Proyecto.findById(id).populate('institucion', 'nombre contacto');
+    
+    if (!proyecto) {
+      return res.status(404).json({ msg: "Proyecto no encontrado" });
+    }
+    
+    res.status(200).json(proyecto);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener el proyecto" });
+  }
+};
 
 export const updateProyecto = async (req, res) => {
   try {

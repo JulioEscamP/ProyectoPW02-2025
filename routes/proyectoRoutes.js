@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProyecto, getProyectos, updateProyecto, deleteProyecto } from '../controllers/proyectoController.js';
+import { createProyecto, getProyectos, updateProyecto,getProyectoById, deleteProyecto } from '../controllers/proyectoController.js';
 import { checkJwt, isAdmin } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
@@ -7,6 +7,7 @@ const router = express.Router();
 // Publico
 // GET /api/proyectos
 router.get('/', getProyectos);
+router.get('/:id', getProyectoById);
 
 // Admin
 // POST /api/proyectos 

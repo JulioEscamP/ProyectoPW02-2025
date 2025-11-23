@@ -7,6 +7,7 @@ import usuarioRoutes from "./routes/usuarioRoutes.js";
 import institucionRoutes from './routes/institucionRoutes.js';
 import proyectoRoutes from './routes/proyectoRoutes.js';
 import aplicacionRoutes from './routes/aplicacionRoutes.js';
+import webhookRoutes from "./routes/webhookRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use("/api/usuarios", usuarioRoutes);
 app.use('/api/instituciones', institucionRoutes);
 app.use('/api/proyectos', proyectoRoutes);
 app.use('/api/aplicaciones', aplicacionRoutes);
+app.use("/api/webhook", webhookRoutes);
 
 app.use((req, res) => {
   res
