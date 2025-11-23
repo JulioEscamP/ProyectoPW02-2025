@@ -3,45 +3,75 @@ import Proyecto from "../models/Proyecto.js";
 
 export const createAplicacion = async (req, res) => {
   try {
-    const { proyectoId } = req.body;
+    const {
+      phone,      
+      studentId,  // Ahora va al perfil de Usuario
+      motivation, // Se queda en Aplicación
+      socialHour, // ID del Proyecto
+      acceptedTerms
+    } = req.body;
+
     const estudianteId = req.usuario.id;
 
-    // Verifica que el proyecto existe y está activo
-    const proyecto = await Proyecto.findById(proyectoId);
+    // VALIDACIONES
+
+    if (!socialHour) {
+      return res.status(400).json({ msg: "Debe seleccionar un proyecto (Social Hour)." });
+    }
+
+    const proyecto = await Proyecto.findById(socialHour);
     if (!proyecto || !proyecto.activo) {
-      return res
-        .status(404)
-        .json({ msg: "El proyecto no existe o no está activo." });
+      return res.status(404).json({ msg: "El proyecto no existe o no está activo." });
     }
 
-    // Verifica que el usuario sea un estudiante
     if (req.usuario.rol !== "usuario") {
-      return res
-        .status(403)
-        .json({ msg: "Los administradores no pueden aplicar a proyectos." });
+      return res.status(403).json({ msg: "Solo los estudiantes pueden aplicar." });
     }
 
-    // Crea la aplicación
-    const aplicacion = new Aplicacion({
-      proyecto: proyectoId,
-      estudiante: estudianteId,
+    const aplicacionExistente = await Aplicacion.findOne({
+      proyecto: socialHour,
+      estudiante: estudianteId
     });
 
-    await aplicacion.save();
-
-    //TODO integrar ms graph api para registrar en excel
-
-    res
-      .status(201)
-      .json({ msg: "Aplicación registrada exitosamente.", data: aplicacion });
-  } catch (error) {
-    if (error.code === 11000) {
-      return res
-        .status(400)
-        .json({ msg: "Error: Ya has aplicado a este proyecto." });
+    if (aplicacionExistente) {
+      return res.status(400).json({ msg: "Ya has enviado una aplicación para este proyecto." });
     }
-    console.error(error);
-    res.status(500).json({ msg: "Error al registrar la aplicación." });
+
+    // ACTUALIZAR PERFIL DEL USUARIO (Carnet y Teléfono)
+    
+    const datosActualizarUsuario = {};
+    if (studentId) datosActualizarUsuario.carnet = studentId;
+    if (phone) datosActualizarUsuario.telefono = phone;
+
+    if (Object.keys(datosActualizarUsuario).length > 0) {
+      await Usuario.findByIdAndUpdate(estudianteId, datosActualizarUsuario);
+    }
+
+    // CREAR LA APLICACIÓN
+    
+    const nuevaAplicacion = new Aplicacion({
+      proyecto: socialHour,
+      estudiante: estudianteId,
+      motivacion: motivation,
+      terminosAceptados: acceptedTerms
+    });
+
+    await nuevaAplicacion.save();
+
+    res.status(201).json({
+      msg: "Aplicación enviada exitosamente.",
+      data: nuevaAplicacion
+    });
+
+  } catch (error) {
+    console.error("Error en createAplicacion:", error);
+    
+    // Manejo de errores de duplicados
+    if (error.code === 11000) {
+       return res.status(400).json({ msg: "Error: El carnet ingresado ya pertenece a otro usuario." });
+    }
+
+    res.status(500).json({ msg: "Hubo un error al procesar tu aplicación." });
   }
 };
 

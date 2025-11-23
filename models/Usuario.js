@@ -20,6 +20,16 @@ const usuarioSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    carnet: {
+      type: String,
+      trim: true,
+      unique: true, 
+      sparse: true,
+    },
+    telefono: {
+      type: String,
+      trim: true,
+    },
     rol: {
       type: String,
       required: true,

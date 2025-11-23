@@ -12,6 +12,13 @@ const aplicacionSchema = new mongoose.Schema(
       ref: "Usuario",
       required: true,
     },
+    motivacion: { // Viene de formData.motivation (FrontEnd)
+      type: String,
+    },
+    terminosAceptados: { // Viene de formData.acceptedTerms (FrontEnd)
+      type: Boolean,
+      default: false,
+    },
     estado: {
       type: String,
       enum: ["Pendiente", "Aprobada", "Rechazada"],
