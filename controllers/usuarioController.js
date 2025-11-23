@@ -1,7 +1,6 @@
 import Usuario from "../models/Usuario.js";
 import jwt from "jsonwebtoken";
 
-// TODO revisar esto
 const registrarUsuario = async (req, res) => {
   const { nombre, correo, contraseña, rol } = req.body;
 
